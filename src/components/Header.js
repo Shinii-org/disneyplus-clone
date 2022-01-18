@@ -42,7 +42,7 @@ const Nav = styled.div`
   display: flex;
   align-items: center;
   padding: 3.6rem;
-  color: white;
+
   text-transform: uppercase;
 `;
 const Logo = styled.img`
