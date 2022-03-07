@@ -1,14 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { useNavigate, useParams } from "react-router-dom";
+import db from "../firebase";
+import { useSelector } from "react-redux";
+import { doc, getDoc } from "firebase/firestore";
+import { selectUserName } from "../features/user/userSlice";
 
 function Detail() {
+  const { id } = useParams();
+  const [detailData, setDetailData] = useState({});
+
+  useEffect(async () => {
+    const docRef = doc(db, "movies", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      setDetailData(docSnap.data());
+    } else {
+      console.log("No such documents");
+    }
+  }, [id]);
+  // const username = useSelector()
   return (
     <Container>
       <Background>
-        <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/9D8AEB7DE234898392BFD20E7D9B112B841E920AF9A3F54CCFB966722AFF3461/scale?width=1920&aspectRatio=1.78&format=jpeg" />
+        <img src={detailData.backgroundImg} alt={detailData.title} />
       </Background>
       <ImgTitle>
-        <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/EF737B93E2F2ABE27C74CBBEB322F18A421E7986129E9989587CEF2295B0447F/scale?width=1344&aspectRatio=1.78&format=png" />
+        <img src={detailData.titleImg} alt={detailData.title} />
       </ImgTitle>
       <Controls>
         <PlayButton>
@@ -26,12 +44,8 @@ function Detail() {
           <img src="/images/group-icon.png" />
         </GroupWatchButton>
       </Controls>
-      <SubTitle>2018 ◾ 7m ◾ Family, Fantasy, Kids, Animation</SubTitle>
-      <Description>
-        A Chinese mom who's sad when her grown son leaves home gets another
-        change at motherhood when one of her dumplings springs to life. But she
-        finds nothing stays cute and small forever.
-      </Description>
+      <SubTitle>{detailData.subTitle}</SubTitle>
+      <Description>{detailData.description}</Description>
     </Container>
   );
 }
@@ -40,16 +54,18 @@ const Container = styled.div`
   min-height: calc(100vh - 7rem);
   padding: 0 calc(3.5vw + 5px);
   position: relative;
+
+  overflow: hidden;
 `;
 
 const Background = styled.div`
   position: fixed;
-  top: 0;
+  top: 7rem;
   left: 0;
   bottom: 0;
   right: 0;
   z-index: -1;
-  opacity: 0.8;
+  opacity: 0.6;
 
   img {
     width: 100%;
@@ -59,6 +75,7 @@ const Background = styled.div`
 `;
 
 const ImgTitle = styled.div`
+  margin-top: 6rem;
   height: 30vh;
   min-height: 17rem;
   min-width: 20rem;
@@ -94,6 +111,12 @@ const PlayButton = styled.button`
   background: rbg(249, 249, 249);
   letter-spacing: 1.8px;
   transition: all 250ms ease-in-out;
+  @media (max-width: 48em) {
+    font-size: 1.2rem;
+    padding: 0 1rem;
+    height: 5rem;
+    margin-right: 1rem !important;
+  }
   &:hover {
     background: rgb(198, 198, 198);
   }
@@ -103,6 +126,9 @@ const TrailerButton = styled(PlayButton)`
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgb(249, 249, 249);
   color: rgb(249, 249, 249);
+  @media (max-width: 48em) {
+    margin-right: 1rem !important;
+  }
 `;
 
 const AddButton = styled.button`
@@ -113,8 +139,13 @@ const AddButton = styled.button`
   border: 2px solid white;
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.6);
+  @media (max-width: 48em) {
+    width: 4rem;
+    height: 4rem;
+    margin-right: 1rem !important;
+  }
   span {
-    font-size: 3rem;
+    font-size: 1.5rem;
     color: white;
   }
 `;
@@ -129,6 +160,9 @@ const SubTitle = styled.div`
   font-size: 1.5rem;
   margin-top: 2.6rem;
   min-height: 2rem;
+  @media (max-width: 48em) {
+    font-size: 1.2rem;
+  }
 `;
 
 const Description = styled.div`
@@ -136,5 +170,9 @@ const Description = styled.div`
   font-size: 2rem;
   margin-top: 1.6rem;
   color: rgb(249, 249, 249);
+  max-width: 70rem;
+  @media (max-width: 48em) {
+    font-size: 1.5rem;
+  }
 `;
 export default Detail;
